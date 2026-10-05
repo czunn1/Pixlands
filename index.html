@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pixlands</title>
-<meta name="description" content="Pixlands is a Roblox game studio creating experiences for players around the world">
+<meta name="description" content="Pixlands is a Roblox game studio creating experiences for players around the world.">
 <meta name="theme-color" content="#e5282d">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Pixlands | Roblox Game Studio">
@@ -458,11 +458,11 @@ a {
 			<dl class="stats">
 				<div class="stats__item">
 					<dt class="stats__label">Total visits</dt>
-					<dd class="stats__value">—</dd>
+					<dd class="stats__value" id="stat-visits">—</dd>
 				</div>
 				<div class="stats__item">
 					<dt class="stats__label">Playing now</dt>
-					<dd class="stats__value">—</dd>
+					<dd class="stats__value" id="stat-playing">—</dd>
 				</div>
 			</dl>
 		</div>
@@ -480,7 +480,7 @@ a {
 					<div class="game__body">
 						<h3 class="game__title">+1 Aura Evolution</h3>
 						<p class="game__description">Welcome to +1 Aura Evolution! Every aura you earn makes you stronger, so go through the obstacles to gain aura and unlock new auras that give huge boosts. Rebirth to unlock new perks, and train on treadmills or sprint across the map to gain even more aura.</p>
-						<a class="button game__link" href="#games" target="_blank" rel="noopener noreferrer">Play on Roblox</a>
+						<a class="button game__link" href="https://www.roblox.com/games/123300593857560/1-Aura-Evolution" target="_blank" rel="noopener noreferrer">Play on Roblox</a>
 					</div>
 				</article>
 			</div>
@@ -528,5 +528,43 @@ a {
 		<a href="https://www.roblox.com/communities/11992143/Pixlands" target="_blank" rel="noopener noreferrer">Roblox community</a>
 	</div>
 </footer>
+<script>
+(function () {
+	const visits = document.getElementById("stat-visits");
+	const playing = document.getElementById("stat-playing");
+	const numberFormat = new Intl.NumberFormat("en-US");
+	let universeId = null;
+
+	async function getJson(url) {
+		const response = await fetch(url);
+
+		if (!response.ok) {
+			throw new Error(response.status);
+		}
+
+		return response.json();
+	}
+
+	async function loadStats() {
+		try {
+			if (!universeId) {
+				const place = await getJson("https://apis.roproxy.com/universes/v1/places/123300593857560/universe");
+				universeId = place.universeId;
+			}
+
+			const games = await getJson("https://games.roproxy.com/v1/games?universeIds=" + universeId);
+			const game = games.data[0];
+
+			visits.textContent = numberFormat.format(game.visits);
+			playing.textContent = numberFormat.format(game.playing);
+		} catch (error) {
+			return;
+		}
+	}
+
+	loadStats();
+	setInterval(loadStats, 60000);
+})();
+</script>
 </body>
 </html>
